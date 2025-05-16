@@ -35,7 +35,6 @@ sf project deploy start --source-dir force-app --target-org vitesse
 **Un Record Trigger Flow pour gerer les erreurs de stockt et notifier l'erreur**
 
 📌 **Voir comment ce flux a été construit étape par étape** :  
-🔗 [Accéder au guide pas à pas](https://vitesse-dev-ed.trailblaze.my.salesforce.com/sfc/p/d200000BXHAD/a/d20000001qvp/3zVMwTed0IZd3zqxsM6fzDNySXDJfcVQtQbwnuqt9II)
 
 [Capture d'ecran du Flux](https://vitesse-dev-ed.trailblaze.my.salesforce.com/sfc/p/#d200000BXHAD/a/d20000001rLd/r4n6.LlfKbTzOEP.VFhrqloavxxhww7BPgOl2GfmovQ)
 
