@@ -1,0 +1,13 @@
+/* style perso pour l'encart d'erreur global */
+.custom-error-banner {
+    background-color: #f26d20; /* orange clair uniforme */
+    border: 1px solid #f26d20;
+    padding: 1rem;
+    color: #f3f7f8; /* texte noir */
+    border-radius: 0.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+
+

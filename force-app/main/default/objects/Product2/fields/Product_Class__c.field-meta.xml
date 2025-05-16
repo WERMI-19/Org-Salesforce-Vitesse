@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Product_Class__c</fullName>
+  <label>Classe du produit</label>
+  <type>Picklist</type>
+  <valueSet>
+    <valueSetDefinition>
+      <value>
+        <fullName>A</fullName>
+        <label>Classe A</label>
+        <default>false</default>
+      </value>
+      <value>
+        <fullName>B</fullName>
+        <label>Classe B</label>
+        <default>false</default>
+      </value>
+    </valueSetDefinition>
+    <restricted>true</restricted>
+  </valueSet>
+</CustomField>
