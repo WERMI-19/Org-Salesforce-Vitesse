@@ -1,7 +1,8 @@
-// Contrôleur pour les lignes d’opportunité
 public with sharing class OpportunityLineItemController {
 
-    // Récupère les lignes de l’opportunité
+    /**
+     * Récupère les lignes d’opportunité associées à une opportunité donnée.
+     */
     @AuraEnabled(cacheable=true)
     public static List<OpportunityLineItem> getOpportunityLineItems(Id opportunityId) {
         return [
@@ -12,50 +13,50 @@ public with sharing class OpportunityLineItemController {
         ];
     }
 
-    // Supprime une ligne d’opportunité
+    /**
+     * Supprime une ligne de produit. Lève une erreur si l’ID est null ou la suppression échoue.
+     */
     @AuraEnabled
     public static void deleteOpportunityLineItem(Id lineItemId) {
         if (lineItemId == null) {
-            // Lancer erreur si Id est nul
-            throw new AuraHandledException('Id de la ligne est null, suppression impossible !');
+            throw new AuraHandledException(
+                'Id de la ligne est null, suppression impossible, actualiser la page ou ajouter des données valides.'
+            );
         }
+
         try {
-            // Supprimer la ligne par Id
             delete new OpportunityLineItem(Id = lineItemId);
         } catch (Exception e) {
-            // Remonter l’erreur capturée
             throw new AuraHandledException('Erreur suppression: ' + e.getMessage());
         }
     }
 
-    // Met à jour les stocks produits
+    /**
+     * Met à jour les stocks de plusieurs produits.
+     * Ignore les lignes invalides ou incomplètes.
+     */
     @AuraEnabled
     public static void updateProductStock(List<Map<String, Object>> updates) {
-        List<Product2> productsToUpdate = new List<Product2>();
+        List<Product2> produitsAMettreAJour = new List<Product2>();
 
-        for (Map<String, Object> row : updates) {
+        for (Map<String, Object> ligne : updates) {
             try {
-                // Extraire les valeurs du map
-                Id productId = (Id)row.get('productId');
-                Integer qty = Integer.valueOf(row.get('quantityInStock') + '');
-
-                // Ajouter le produit à mettre à jour
-                if (productId != null && qty != null) {
-                    productsToUpdate.add(new Product2(Id = productId, QuantityInStock__c = qty));
-                } else {
-                    // Données manquantes ignorées
-                    System.debug('Ligne ignorée: données manquantes ' + row);
+                if (ligne == null || !ligne.containsKey('productId') || !ligne.containsKey('quantityInStock')) {
+                    continue;
                 }
+
+                Id productId = (Id) ligne.get('productId');
+                Decimal quantity = Decimal.valueOf(String.valueOf(ligne.get('quantityInStock')));
+
+                produitsAMettreAJour.add(new Product2(Id = productId, QuantityInStock__c = quantity));
             } catch (Exception e) {
-                // Erreur de conversion capturée
-                System.debug('Erreur parsing ligne: ' + e.getMessage());
+                // Ignore les erreurs sur les lignes mal formatées
+                continue;
             }
         }
 
-        // Mettre à jour les produits si nécessaires
-        if (!productsToUpdate.isEmpty()) {
-            update productsToUpdate;
+        if (!produitsAMettreAJour.isEmpty()) {
+            update produitsAMettreAJour;
         }
     }
 }
-

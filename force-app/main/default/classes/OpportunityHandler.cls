@@ -1,35 +1,37 @@
-// Classe pour les opportunités gagnées
-public class OpportunityHandler {
+public with sharing class OpportunityHandler {
 
-    // Vérifie la quantité de stock disponible
     public static void processClosedWonOpportunities(List<Opportunity> opportunities) {
-
-        // Récupérer les IDs des opportunités
         Set<Id> oppIds = new Set<Id>();
         for (Opportunity opp : opportunities) {
             oppIds.add(opp.Id);
         }
 
-        // Requête des lignes liées à l’opportunité
         List<OpportunityLineItem> lineItems = [
-            SELECT Id, Quantity, Product2Id, Product2.QuantityInStock__c
+            SELECT Id, Quantity, OpportunityId, Product2Id, Product2.QuantityInStock__c
             FROM OpportunityLineItem
             WHERE OpportunityId IN :oppIds
         ];
 
-        // Parcourir les lignes de produit
+        Map<Id, Product2> produitsAmettreAJour = new Map<Id, Product2>();
+
         for (OpportunityLineItem oli : lineItems) {
-
-            // Vérifier si quantité dépasse le stock
-            if (oli.Quantity > oli.Product2.QuantityInStock__c) {
-
-                // Ajouter une erreur à l’opportunité
+            if (oli.Product2.QuantityInStock__c == null || oli.Quantity > oli.Product2.QuantityInStock__c) {
                 for (Opportunity opp : opportunities) {
-                    opp.addError('Votre opportunité ne peut pas être mise à jour car vous avez un souci de quantité sur vos lignes.');
+                    if (opp.Id == oli.OpportunityId) {
+                        opp.addError(Label.Error_Stock); // Erreur internationalisée
+                    }
                 }
-
-                return; // Arrêter le traitement immédiatement
+                return;
+            } else {
+                Product2 p = oli.Product2;
+                p.QuantityInStock__c -= oli.Quantity;
+                produitsAmettreAJour.put(p.Id, p);
             }
+        }
+
+        if (!produitsAmettreAJour.isEmpty()) {
+            update produitsAmettreAJour.values();
         }
     }
 }
+

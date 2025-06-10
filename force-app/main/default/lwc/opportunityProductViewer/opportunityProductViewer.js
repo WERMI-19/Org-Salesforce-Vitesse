@@ -11,6 +11,10 @@ import Label_PrixTotal from '@salesforce/label/c.Label_PrixTotal';
 import Label_QuantiteStock from '@salesforce/label/c.Label_QuantiteStock';
 import Label_Supprimer from '@salesforce/label/c.Label_Supprimer';
 import Label_VoirProduit from '@salesforce/label/c.Label_VoirProduit';
+import Label_MessageStockError from '@salesforce/label/c.Label_MessageStockError';
+import Label_OpportunityProduits from '@salesforce/label/c.Label_OpportunityProduits';
+import Label_ErreurMajStock from '@salesforce/label/c.Label_ErreurMajStock';
+import Label_AucunProduit from '@salesforce/label/c.Label_AucunProduit';
 
 import getOpportunityLineItems from '@salesforce/apex/OpportunityLineItemController.getOpportunityLineItems';
 import deleteOpportunityLineItem from '@salesforce/apex/OpportunityLineItemController.deleteOpportunityLineItem';
@@ -22,9 +26,29 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
     userProfile = '';
     columns = [];
 
+    //  Exposer les labels pour le HTML
+    Label_OpportunityProduits = Label_OpportunityProduits;
+    Label_MessageStockError = Label_MessageStockError;
+    Label_AucunProduit = Label_AucunProduit;
+
+    // regrouper aussi pour usage JS (datatable)
+    label = {
+        Label_NomProduit,
+        Label_Quantite,
+        Label_PrixUnitaire,
+        Label_PrixTotal,
+        Label_QuantiteStock,
+        Label_Supprimer,
+        Label_VoirProduit,
+        Label_MessageStockError,
+        Label_OpportunityProduits,
+        Label_ErreurMajStock,
+        Label_AucunProduit
+    };
+
     connectedCallback() {
         this.initComponent();  // au demarrage on initie le composant pr charger les données
-    }// life cyle hooks
+    } // life cycle hooks
 
     async initComponent() {
         try {
@@ -41,13 +65,13 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
         const baseColumns = [
             { label: Label_NomProduit, fieldName: 'productName', type: 'text' },
             { label: Label_Quantite, fieldName: 'quantity', type: 'number',
-                cellAttributes: {   //couleur rouge SUR QUANTITE SI stock insuffisant &css inline
+                cellAttributes: {   // couleur rouge SUR QUANTITE SI stock insuffisant & css inline
                     style: { fieldName: 'stockError' }
                 }
             },
             { label: Label_PrixUnitaire, fieldName: 'unitPrice', type: 'currency' },
             { label: Label_PrixTotal, fieldName: 'totalPrice', type: 'currency' },
-            {label: Label_QuantiteStock,fieldName: 'quantityInStock',type: 'number'},
+            { label: Label_QuantiteStock, fieldName: 'quantityInStock', type: 'number' },
             {
                 label: Label_Supprimer,
                 type: 'button-icon',
@@ -60,10 +84,11 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
                 }
             }
         ];
-             //lowercase pour eviter les erreurs de majuscule
+
+        // lowercase pour eviter les erreurs de majuscule
         const normalizedProfile = this.userProfile?.toLowerCase();
         if (normalizedProfile === 'system administrator') {
-            baseColumns.push({//Ajouter la colonne VOIR produit uniquement pour les admins
+            baseColumns.push({ // Ajouter la colonne VOIR produit uniquement pour les admins
                 type: 'button',
                 label: Label_VoirProduit,
                 typeAttributes: {
@@ -75,7 +100,7 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
             });
         }
 
-        return baseColumns;  // retourne les colonnes quon va utiliser dans datatable
+        return baseColumns;  // retourne les colonnes qu’on va utiliser dans datatable
     }
 
     async loadLineItems() {
@@ -94,24 +119,23 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
                     stockError: (quantityInStock - item.Quantity) < 0
                         ? 'background-image: repeating-linear-gradient(45deg, #eeeeee, #eeeeee 10px, #dddddd 10px, #dddddd 20px); color: brown; font-weight: bold;'
                         : 'color: darkgreen; font-weight: bold;',
-
                 };
             });
-            
         } catch (error) {
             console.error('Votre opportunité ne peut pas être mise à jour car vous avez un souci de quantité sur vos lignes.', error);
             this.lineItems = [];
         }
     }
 
-    get hasLineItems() {// verifier si ya au moin UNE ligne ou non
-        return Array.isArray(this.lineItems) && this.lineItems.length > 0; 
-    }
-    get hasStockError() {// verifie si une ligne a un stock negatif
-        return this.lineItems.some(item => (item.quantityInStock - item.quantity) < 0); 
+    get hasLineItems() { // verifier si ya au moin UNE ligne ou non
+        return Array.isArray(this.lineItems) && this.lineItems.length > 0;
     }
 
-    handleRowAction(event) {//LES redirections
+    get hasStockError() { // verifie si une ligne a un stock negatif
+        return this.lineItems.some(item => (item.quantityInStock - item.quantity) < 0);
+    }
+
+    handleRowAction(event) { // LES redirections
         const { name } = event.detail.action;
         const row = event.detail.row;
 
@@ -126,7 +150,7 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
         try {
             await deleteOpportunityLineItem({ lineItemId: row.id });
             this.showToast('Succès', 'Ligne supprimée avec succès', 'success');
-            await this.loadLineItems();  // recharge la liste apres suppression pour MAJ l'affichage
+            await this.loadLineItems(); // recharge la liste apres suppression pour MAJ l'affichage
         } catch (error) {
             this.showToast('Erreur', error.body?.message || 'Erreur inconnue', 'error');
         }

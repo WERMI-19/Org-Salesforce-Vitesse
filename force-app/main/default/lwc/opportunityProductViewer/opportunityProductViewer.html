@@ -1,16 +1,14 @@
 <template>
-    <lightning-card title="Opportunity Products" icon-name="standard:opportunity">
-        <!-- affiche le MESSAGE d erreur SI ya un probleme de stock au moin UNE ligne -->
-         <template if:true={hasStockError}>
-            <div class="custom-error-banner" role="alert"> <!--utiliser depuis le css du global static ressource dans l'org -->
-                <span>
-                    Vous avez au moins une ligne avec un problème de quantité, veuillez supprimer cette ligne ou réduire sa quantité.
-                    <br/>
-                    Si vous avez absolument besoin de plus de produits, veuillez contacter votre administrateur système.
-                </span>
+    <lightning-card title={Label_OpportunityProduits} icon-name="standard:opportunity">
+
+        <!-- Message d'erreur si au moins une ligne pose un problème de stock -->
+        <template if:true={hasStockError}>
+            <div class="custom-error-banner" role="alert">
+                <lightning-formatted-rich-text value={Label_MessageStockError}></lightning-formatted-rich-text>
             </div>
         </template>
-         <!-- Bloc tableau : AJOUT d'un <div> wrapper avec la classe conditionnelle -->
+
+        <!-- Tableau de lignes produits -->
         <template if:true={hasLineItems}>
             <div class="slds-p-around_medium">
                 <lightning-datatable
@@ -22,16 +20,13 @@
                 </lightning-datatable>
             </div>
         </template>
-        
-         <!-- sinon si ya AUCUNE ligne on affiche un MESSAGE au user pour l aider -->
+
+        <!-- Message affiché si aucune ligne de produit -->
         <template if:false={hasLineItems}>
             <div class="slds-p-around-medium slds-text-color_weak">
-                <p><strong>Vous n'avez aucune ligne de produits pour le moment.</strong></p>
-                <p>1. Veuillez tout d'abord sélectionner un Catalogue (Pricebook)</p>
-                <p>2. Sélectionnez ensuite les produits à ajouter.</p>
+                <lightning-formatted-rich-text value={Label_AucunProduit}></lightning-formatted-rich-text>
             </div>
         </template>
-        
-        
+
     </lightning-card>
 </template>

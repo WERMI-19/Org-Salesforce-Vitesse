@@ -1,94 +1,53 @@
 @isTest
 private class OpportunityHandlerTest {
+
+    /**
+     * Teste la décrémentation du stock avec stock suffisant
+     */
     @isTest
-    static void testProcessClosedWonOpportunities_ValidStock() {
-        // Produit avec stock suffisant
-        Product2 product = new Product2(Name = 'Voiture Électrique A', QuantityInStock__c = 10);
-        insert product;
-
-        // Récupérer le Pricebook standard
-        Pricebook2 standardPricebook = [SELECT Id FROM Pricebook2 WHERE IsStandard = true LIMIT 1];
-
-        // Lier le produit au Pricebook
-        PricebookEntry pbe = new PricebookEntry(
-            Pricebook2Id = standardPricebook.Id,
-            Product2Id = product.Id,
-            UnitPrice = 50000,
-            IsActive = true
+    static void testStockSuffisantClosedWon() {
+        // Crée toutes les données de test
+        TestDataFactory.TestDataWrapper data = TestDataFactory.createFullOpportunity(
+            'Produit Test', 10, 500, 2, 'Opp Stock OK', 'Prospecting', 5
         );
-        insert pbe;
 
-        // Créer une opportunité non fermée
-        Opportunity opp = new Opportunity(
-            Name = 'Test Opp',
-            StageName = 'Prospecting',
-            CloseDate = Date.today().addDays(10)
-        );
-        insert opp;
-
-        // Ajouter une ligne d’opportunité
-        OpportunityLineItem oli = new OpportunityLineItem(
-            OpportunityId = opp.Id,
-            Quantity = 5,
-            PricebookEntryId = pbe.Id,
-            TotalPrice = 250000
-        );
-        insert oli;
-
-        // Passer l’opportunité à Closed Won
+        // Important : mettre à jour l'opportunité pour déclencher le trigger
+        Opportunity opp = [SELECT Id, StageName FROM Opportunity WHERE Id = :data.opportunity.Id];
         opp.StageName = 'Closed Won';
-        update opp;
 
-        // Afficher la quantité en stock
-        System.debug('Stock: ' + product.QuantityInStock__c);
+        Test.startTest();
+        update opp; // Cela déclenche le trigger et la méthode du handler
+        Test.stopTest();
 
-        // Vérifier le stage de l’opportunité
-        System.assertEquals('Closed Won', [SELECT StageName FROM Opportunity WHERE Id = :opp.Id].StageName);
+        // Vérifie que le stock a été mis à jour
+        Product2 prod = [SELECT QuantityInStock__c FROM Product2 WHERE Id = :data.product.Id];
+        System.assertEquals(8, prod.QuantityInStock__c);
     }
 
+    /**
+     * Teste le blocage si stock insuffisant
+     */
     @isTest
-    static void testProcessClosedWonOpportunities_InvalidStock() {
-        // Produit avec stock insuffisant
-        Product2 product = new Product2(Name = 'Voiture Électrique B', QuantityInStock__c = 3);
-        insert product;
-
-        // Récupérer le Pricebook standard
-        Pricebook2 standardPricebook = [SELECT Id FROM Pricebook2 WHERE IsStandard = true LIMIT 1];
-
-        // Lier le produit au Pricebook
-        PricebookEntry pbe = new PricebookEntry(
-            Pricebook2Id = standardPricebook.Id,
-            Product2Id = product.Id,
-            UnitPrice = 40000,
-            IsActive = true
+    static void testStockInsuffisantClosedWon() {
+        // Stock initial = 1, mais commande de 3 → doit échouer
+        TestDataFactory.TestDataWrapper data = TestDataFactory.createFullOpportunity(
+            'Produit KO', 1, 400, 3, 'Opp Stock KO', 'Prospecting', 5
         );
-        insert pbe;
 
-        // Créer une opportunité non fermée
-        Opportunity opp = new Opportunity(
-            Name = 'Test Opp Invalid',
-            StageName = 'Prospecting',
-            CloseDate = Date.today().addDays(10)
-        );
-        insert opp;
+        Opportunity opp = [SELECT Id FROM Opportunity WHERE Id = :data.opportunity.Id];
+        opp.StageName = 'Closed Won';
 
-        // Ajouter ligne avec quantité excessive
-        OpportunityLineItem oli = new OpportunityLineItem(
-            OpportunityId = opp.Id,
-            Quantity = 5,
-            PricebookEntryId = pbe.Id,
-            TotalPrice = 200000
-        );
-        insert oli;
-
-        // Essayer de passer à Closed Won
+        Test.startTest();
         try {
-            opp.StageName = 'Closed Won';
             update opp;
-            System.assert(false, 'Une erreur aurait dû être levée lors de la mise à jour');
+            System.assert(false, 'Une erreur était attendue pour stock insuffisant');
         } catch (DmlException e) {
-            // Vérifier le message d’erreur
-            System.assert(e.getMessage().contains('souci de quantité'), 'Le message d\'erreur attendu n’a pas été trouvé');
+            System.assert(
+                e.getMessage().toLowerCase().contains('stock'),
+                'Le message d’erreur doit mentionner le stock'
+            );
         }
+        Test.stopTest();
     }
 }
+
