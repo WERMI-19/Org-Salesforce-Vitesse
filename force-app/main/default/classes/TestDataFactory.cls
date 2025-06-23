@@ -22,18 +22,20 @@ public class TestDataFactory {
      * Crée un utilisateur de test avec le profil spécifié.
      */
     public static User createUserWithProfile(String profileName) {
-        Profile profile = [SELECT Id FROM Profile WHERE Name = :profileName LIMIT 1];
+        List<Profile> profiles = [SELECT Id FROM Profile WHERE Name = :profileName LIMIT 1];
+        System.assert(!profiles.isEmpty(), 'Le profil "' + profileName + '" est introuvable dans cette organisation.');
+
         User user = new User(
             FirstName = 'Test',
             LastName = 'User',
-            Email = 'testuser@example.com',
+            Email = 'testuser' + DateTime.now().getTime() + '@example.com', // Rendre l'email unique
             Username = 'testuser' + DateTime.now().getTime() + '@example.com',
             Alias = 'tuser',
             TimeZoneSidKey = 'Europe/Paris',
             LocaleSidKey = 'fr_FR',
             EmailEncodingKey = 'UTF-8',
             LanguageLocaleKey = 'fr',
-            ProfileId = profile.Id
+            ProfileId = profiles[0].Id
         );
         insert user;
         return user;
@@ -41,10 +43,11 @@ public class TestDataFactory {
 
     /**
      * Crée un produit actif avec un stock spécifié.
+     * Le nom est rendu unique pour éviter les conflits dans les tests.
      */
     public static Product2 createProduct(String name, Integer stock) {
         Product2 product = new Product2(
-            Name = name,
+            Name = name + System.currentTimeMillis(), // Correction: Rendre le nom du produit unique
             QuantityInStock__c = stock,
             IsActive = true
         );
@@ -54,32 +57,42 @@ public class TestDataFactory {
 
     /**
      * Crée une entrée de PricebookEntry dans le Pricebook standard.
-     * Gère l’activation automatique du Pricebook si nécessaire.
+     * Correction: Vérifie si l'entrée existe déjà pour éviter les erreurs de doublon
+     * et utilise Test.getStandardPricebookId().
      */
     public static PricebookEntry createPricebookEntry(Product2 product, Decimal unitPrice) {
-        // Vérifie que le Pricebook standard existe et est actif
-        Pricebook2 standardPB = [SELECT Id, IsActive FROM Pricebook2 WHERE IsStandard = true LIMIT 1];
+        // Obtenir l'ID du catalogue de prix standard de manière fiable en contexte de test
+        Id standardPricebookId = Test.getStandardPricebookId();
 
-        if (!standardPB.IsActive) {
-            standardPB.IsActive = true;
-            update standardPB;
+        // Tenter de trouver une PricebookEntry existante pour ce produit et ce Pricebook standard
+        List<PricebookEntry> existingPBEs = [
+            SELECT Id, Product2Id, Pricebook2Id, UnitPrice, IsActive
+            FROM PricebookEntry
+            WHERE Product2Id = :product.Id
+            AND Pricebook2Id = :standardPricebookId
+            LIMIT 1
+        ];
+
+        if (!existingPBEs.isEmpty()) {
+            // Si une entrée existe déjà, la retourner.
+            // On suppose que l'entrée existante est suffisante pour le test.
+            return existingPBEs[0];
         }
 
-        // Création de l’entrée de prix
+        // Si aucune entrée n'existe, créer et insérer une nouvelle entrée
         PricebookEntry pbe = new PricebookEntry(
-            Pricebook2Id = standardPB.Id,
+            Pricebook2Id = standardPricebookId,
             Product2Id = product.Id,
             UnitPrice = unitPrice,
             IsActive = true
         );
+        insert pbe; // Cette ligne est la ligne 64 mentionnée dans votre erreur précédente
 
-        insert pbe;
         return pbe;
     }
 
-    /**
-     * Crée une opportunité avec un Pricebook donné.
-     */
+        // Crée une opportunité avec un Pricebook donné.
+
     public static Opportunity createOpportunity(String name, String stage, Integer daysToClose, Id pricebookId) {
         Opportunity opp = new Opportunity(
             Name = name,
@@ -91,9 +104,8 @@ public class TestDataFactory {
         return opp;
     }
 
-    /**
-     * Crée une ligne de produit associée à une opportunité.
-     */
+      // Crée une ligne de produit associée à une opportunité.
+
     public static OpportunityLineItem createOpportunityLine(Opportunity opp, PricebookEntry pbe, Integer quantity, Decimal unitPrice) {
         OpportunityLineItem oli = new OpportunityLineItem(
             OpportunityId = opp.Id,
@@ -105,9 +117,7 @@ public class TestDataFactory {
         return oli;
     }
 
-    /**
-     * Génère toutes les données nécessaires à un test d’opportunité complet.
-     */
+      //Génère toutes les données nécessaires à un test d’opportunité complet.
     public static TestDataWrapper createFullOpportunity(
         String productName,
         Integer stock,
@@ -124,19 +134,16 @@ public class TestDataFactory {
         return new TestDataWrapper(product, pbe, opp, oli);
     }
 
-    /**
-     * Crée une opportunité sans ligne produit – utile pour tester les cas limites.
-     */
+    //Crée une opportunité sans ligne produit – utile pour tester les cas limites.
     public static Opportunity createEmptyOpportunity(String name, String stage, Integer daysToClose) {
-        // Création d’un Pricebook spécifique pour cette opportunité vide
-        Pricebook2 pb = new Pricebook2(Name = 'PB Empty Test', IsActive = true);
-        insert pb;
-        return createOpportunity(name, stage, daysToClose, pb.Id);
+        
+        
+        // Utiliser le Pricebook standard pour l'opportunité vide
+        Id standardPricebookId = Test.getStandardPricebookId(); // Obtenir l'ID du Pricebook standard
+        return createOpportunity(name, stage, daysToClose, standardPricebookId);
     }
 
-    /**
-     * Variante simplifiée pour générer une opportunité prête à être testée dans un trigger.
-     */
+    //générer une opportunité prête à être testée dans un trigger.
     public static TestDataWrapper createOpportunityForTrigger(
         String productName,
         Integer stockInitial,

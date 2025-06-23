@@ -1,23 +1,19 @@
-trigger OpportunityTrigger on Opportunity (after update) {
-
-    // Vérifie que le contexte est bien after update
-    if (Trigger.isAfter && Trigger.isUpdate) {
+trigger OpportunityTrigger on Opportunity (before update) {
+    System.debug('DEBUG: OpportunityTrigger - Déclencheur activé.'); // Indique le début du déclencheur
+    if (Trigger.isBefore && Trigger.isUpdate) {
         List<Opportunity> closedWonOpps = new List<Opportunity>();
 
-        // Parcours des opportunités modifiées
-        for (Opportunity opp : Trigger.new) {
-            Opportunity oldOpp = Trigger.oldMap.get(opp.Id);
+        for (Opportunity newOpp : Trigger.new) {
+            Opportunity oldOpp = Trigger.oldMap.get(newOpp.Id);
 
-            // Vérifie le changement de statut vers "Closed Won"
-            if (opp.StageName == 'Closed Won' && oldOpp.StageName != 'Closed Won') {
-                closedWonOpps.add(opp);
+            if (newOpp.StageName == 'Closed Won' && oldOpp.StageName != 'Closed Won') {
+                closedWonOpps.add(newOpp);
             }
         }
 
-        // Si au moins une opportunité est concernée, déléguer à la classe handler
         if (!closedWonOpps.isEmpty()) {
+            System.debug('DEBUG: OpportunityTrigger - Appel de OpportunityHandler.processClosedWonOpportunities avec ' + closedWonOpps.size() + ' opportunité(s).'); // Indique le début du traitement clé
             OpportunityHandler.processClosedWonOpportunities(closedWonOpps);
         }
     }
 }
-
