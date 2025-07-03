@@ -25,13 +25,7 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
     lineItems = [];
     userProfile = '';
     columns = [];
-
-    //  Exposer les labels pour le HTML
-    Label_OpportunityProduits = Label_OpportunityProduits;
-    Label_MessageStockError = Label_MessageStockError;
-    Label_AucunProduit = Label_AucunProduit;
-
-    // regrouper aussi pour usage JS (datatable)
+    // Tous les labels sont regroupés pour usage JS (datatable) et HTML
     label = {
         Label_NomProduit,
         Label_Quantite,

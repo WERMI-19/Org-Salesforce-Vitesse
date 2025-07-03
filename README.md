@@ -32,13 +32,8 @@ sf project deploy start --source-dir force-app --target-org vitesse
 - Si une ligne dépasse le stock disponible → blocage avec un message utilisateur.
 - La mise à jour du stock est ensuite déléguée à un **Flow RTF automatique** dans l'organisation.
 
-**Un Record Trigger Flow pour gerer les erreurs de stockt et notifier l'erreur**
+**Un Record Trigger Flow via Apex Trigger pour gerer les erreurs de stockt et notifier l'erreur**
 
-📌 **Voir comment ce flux a été construit étape par étape** :  
-
-[Capture d'ecran du Flux](https://vitesse-dev-ed.trailblaze.my.salesforce.com/sfc/p/#d200000BXHAD/a/d20000001rLd/r4n6.LlfKbTzOEP.VFhrqloavxxhww7BPgOl2GfmovQ)
-
----
 
 ## 🌍 Internationalisation
 
@@ -94,7 +89,7 @@ sf project deploy start --source-dir force-app --target-org vitesse
 |----------------------------------|----------------------|
 | OpportunityHandler               | 100% (via trigger)   |
 | OpportunityLineItemController    | 100%                 |
-| UserProfileController            | ≥ 80%                |
+| UserProfileController            |  100%                |
 
 ### Test d’intégration (via Execute Anonymous)
 
@@ -120,4 +115,5 @@ sf project deploy start --source-dir force-app --target-org vitesse
 ## 👤 Auteur
 
 - Projet réalisé par : *WERMI ADAMA*
+- date de réalisation: Juin 2025
 - Contact : *adamalivres19@gmail.com*

@@ -1,14 +1,15 @@
 <template>
-    <lightning-card title={Label_OpportunityProduits} icon-name="standard:opportunity">
+    <!-- Carte principale affichant les produits liés à une opportunité -->
+    <lightning-card title={label.Label_OpportunityProduits} icon-name="standard:opportunity">
 
-        <!-- Message d'erreur si au moins une ligne pose un problème de stock -->
+        <!-- Affiche un message d'erreur si un problème de stock est détecté -->
         <template if:true={hasStockError}>
             <div class="custom-error-banner" role="alert">
-                <lightning-formatted-rich-text value={Label_MessageStockError}></lightning-formatted-rich-text>
+                <lightning-formatted-rich-text value={label.Label_MessageStockError}></lightning-formatted-rich-text>
             </div>
         </template>
 
-        <!-- Tableau de lignes produits -->
+        <!-- Affiche le tableau des produits si des lignes d'opportunité existent -->
         <template if:true={hasLineItems}>
             <div class="slds-p-around_medium">
                 <lightning-datatable
@@ -21,10 +22,10 @@
             </div>
         </template>
 
-        <!-- Message affiché si aucune ligne de produit -->
+        <!-- Message alternatif si aucun produit n'est lié à l'opportunité -->
         <template if:false={hasLineItems}>
             <div class="slds-p-around-medium slds-text-color_weak">
-                <lightning-formatted-rich-text value={Label_AucunProduit}></lightning-formatted-rich-text>
+                <lightning-formatted-rich-text value={label.Label_AucunProduit}></lightning-formatted-rich-text>
             </div>
         </template>
 
