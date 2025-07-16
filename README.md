@@ -56,13 +56,14 @@ sf project deploy start --source-dir force-app --target-org vitesse
   - OpportunityLineItemControllerTest.cls
   - UserProfileController.cls
   - UserProfileControllerTest.cls
+  - OpportunityTriggerTest
+  - TestDataFactory.cls
 
 /triggers
   - OpportunityTrigger.trigger
 
 /lwc
   - OpportunityProductViewer
-  - ProductListViewer
 
 /objects
   - Product2
@@ -89,7 +90,8 @@ sf project deploy start --source-dir force-app --target-org vitesse
 |----------------------------------|----------------------|
 | OpportunityHandler               | 100% (via trigger)   |
 | OpportunityLineItemController    | 100%                 |
-| UserProfileController            |  100%                |
+| UserProfileController            | 100%
+| OpportunityTrigger               | 100%                |
 
 ### Test d’intégration (via Execute Anonymous)
 
