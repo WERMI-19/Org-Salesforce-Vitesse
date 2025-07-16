@@ -1,3 +1,6 @@
+// Trigger avant mise à jour qui détecte le passage à "Closed Won"
+// et ajuste le stock via OpportunityHandler.
+
 trigger OpportunityTrigger on Opportunity (before update) {
     System.debug('DEBUG: OpportunityTrigger - Déclencheur activé.'); // Indique le début du déclencheur
     if (Trigger.isBefore && Trigger.isUpdate) {
