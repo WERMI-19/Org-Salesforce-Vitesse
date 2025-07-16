@@ -1,4 +1,6 @@
 @isTest
+// Teste la suppression, récupération et mise à jour des lignes d’opportunité.
+
 private class OpportunityLineItemControllerTest {
 
     // Vérifie que la suppression d'une ligne fonctionne

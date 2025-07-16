@@ -1,4 +1,7 @@
 @isTest
+// Vérifie que le trigger met à jour le stock ou bloque 
+//l’opportunité selon la disponibilité.
+
 private class OpportunityTriggerTest {
 
     /**

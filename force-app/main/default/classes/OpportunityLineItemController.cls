@@ -1,3 +1,7 @@
+// Teste les opérations sur les lignes d’opportunité : 
+//récupération, suppression et mise à jour de stock.
+
+
 public with sharing class OpportunityLineItemController {
 
     /**

@@ -1,7 +1,9 @@
+// Gère les opportunités gagnées et ajuste le stock des produits.
+
 public with sharing class OpportunityHandler {
 
     public static void processClosedWonOpportunities(List<Opportunity> opportunities) {
-        // Ligne 1 : Indique l'entrée dans la méthode et le nombre d'opportunités traitées.
+        // Indique l'entrée dans la méthode et le nombre d'opportunités traitées.
         System.debug('DEBUG: OpportunityHandler - Méthode processClosedWonOpportunities appelée. Nombre d\'opportunités: ' + opportunities.size());
 
         Set<Id> oppIds = new Set<Id>();
@@ -14,7 +16,7 @@ public with sharing class OpportunityHandler {
             FROM OpportunityLineItem
             WHERE OpportunityId IN :oppIds
         ];
-        // Ligne 2 : Confirme le nombre de lignes de produit trouvées, essentiel pour le traitement suivant.
+        // Confirme le nombre de lignes de produit trouvées, essentiel pour le traitement suivant.
         System.debug('DEBUG: OpportunityHandler - Nombre de lignes de produit trouvées: ' + lineItems.size());
 
 
@@ -40,7 +42,7 @@ public with sharing class OpportunityHandler {
         }
 
         if (!produitsAmettreAJour.isEmpty()) {
-            // Ligne 3 : Indique la tentative de mise à jour finale des produits.
+            // Indique la tentative de mise à jour finale des produits.
             System.debug('DEBUG: OpportunityHandler - Tentative de mise à jour des produits. Nombre: ' + produitsAmettreAJour.size());
             update produitsAmettreAJour.values();
         }

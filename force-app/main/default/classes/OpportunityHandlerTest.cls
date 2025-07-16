@@ -1,4 +1,7 @@
 @isTest
+
+// Vérifie les cas d’usage liés au stock lors de la clôture des opportunités.
+
 private class OpportunityHandlerTest {
 
     // Méthode de configuration pour les données communes

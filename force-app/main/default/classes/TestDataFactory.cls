@@ -1,4 +1,7 @@
 @isTest
+// Fournit des méthodes utilitaires pour générer des données 
+//de test complètes et réutilisables.
+
 public class TestDataFactory {
 
     public class TestDataWrapper {
@@ -16,7 +19,7 @@ public class TestDataFactory {
     }
 
     public static User createUserWithProfile(String profileName) {
-        List<Profile> profiles = [SELECT Id FROM Profile WHERE Name = :profileName LIMIT 1];
+        List<Profile> profiles = [SELECT Id, Name FROM Profile WHERE Name = :profileName LIMIT 1];
         System.assert(!profiles.isEmpty(), 'Le profil "' + profileName + '" est introuvable.');
 
         User user = new User(
@@ -26,9 +29,9 @@ public class TestDataFactory {
             Username = 'testuser' + DateTime.now().getTime() + '@example.com',
             Alias = 'tuser',
             TimeZoneSidKey = 'Europe/Paris',
-            LocaleSidKey = 'fr_FR',
+            LocaleSidKey = 'en_US',
             EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'fr',
+            LanguageLocaleKey = 'en_US',
             ProfileId = profiles[0].Id
         );
         insert user;
