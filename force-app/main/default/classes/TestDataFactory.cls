@@ -17,7 +17,7 @@ public class TestDataFactory {
             this.oli = oli;
         }
     }
-
+     // Crée un utilisateur test avec un profil spécifique.
     public static User createUserWithProfile(String profileName) {
         List<Profile> profiles = [SELECT Id, Name FROM Profile WHERE Name = :profileName LIMIT 1];
         System.assert(!profiles.isEmpty(), 'Le profil "' + profileName + '" est introuvable.');
@@ -37,7 +37,7 @@ public class TestDataFactory {
         insert user;
         return user;
     }
-
+     // Un produit avec un nom unique et une quantité en stock.
     public static Product2 createProduct(String name, Integer stock) {
         Product2 product = new Product2(
             Name = name + System.currentTimeMillis(),
@@ -48,6 +48,8 @@ public class TestDataFactory {
         return product;
     }
 
+
+    //Associe un prix à un produit dans le catalogue standard (Pricebook)
     public static PricebookEntry createPricebookEntry(Product2 product, Decimal unitPrice) {
         Id standardPricebookId = Test.getStandardPricebookId();
 
@@ -72,7 +74,8 @@ public class TestDataFactory {
         insert pbe;
         return pbe;
     }
-
+     // Crée une opportunité avec un nom, une étape, une date de clôture et un Pricebook.
+    // Utilise le Pricebook standard par défaut.
     public static Opportunity createOpportunity(String name, String stage, Integer daysToClose, Id pricebookId) {
         Opportunity opp = new Opportunity(
             Name = name,
@@ -83,7 +86,7 @@ public class TestDataFactory {
         insert opp;
         return opp;
     }
-
+    //Ajoute une ligne produit dans l’opportunité (quantité + prix)
     public static OpportunityLineItem createOpportunityLine(Opportunity opp, PricebookEntry pbe, Integer quantity, Decimal unitPrice) {
         OpportunityLineItem oli = new OpportunityLineItem(
             OpportunityId = opp.Id,
@@ -94,7 +97,7 @@ public class TestDataFactory {
         insert oli;
         return oli;
     }
-
+    // Crée plusieurs lignes de produit pour une opportunité donnée.
     public static List<OpportunityLineItem> createMultipleOpportunityLines(Opportunity opp, Integer numberOfLines) {
         List<OpportunityLineItem> olis = new List<OpportunityLineItem>();
 
@@ -111,7 +114,7 @@ public class TestDataFactory {
         insert olis;
         return olis;
     }
-
+   //retourne un objet spécial : TestDataWrapper, qui contient tous les objets créés
     public static TestDataWrapper createFullOpportunity(
         String productName,
         Integer stock,
@@ -127,7 +130,7 @@ public class TestDataFactory {
         OpportunityLineItem oli = createOpportunityLine(opp, pbe, quantity, unitPrice);
         return new TestDataWrapper(product, pbe, opp, oli);
     }
-
+    // Crée une opportunité vide avec un nom, une étape et une date de clôture.
     public static Opportunity createEmptyOpportunity(String name, String stage, Integer daysToClose) {
         Id standardPricebookId = Test.getStandardPricebookId();
         return createOpportunity(name, stage, daysToClose, standardPricebookId);

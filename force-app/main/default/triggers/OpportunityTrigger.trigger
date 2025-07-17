@@ -14,9 +14,12 @@ trigger OpportunityTrigger on Opportunity (before update) {
             }
         }
 
+        //appel LA CLASS OpportunityHandler.processClosedWonOpportunities
+
         if (!closedWonOpps.isEmpty()) {
-            System.debug('DEBUG: OpportunityTrigger - Appel de OpportunityHandler.processClosedWonOpportunities avec ' + closedWonOpps.size() + ' opportunité(s).'); // Indique le début du traitement clé
+            System.debug('DEBUG: OpportunityTrigger - Appel de OpportunityHandler.processClosedWonOpportunities avec ' + closedWonOpps.size() + ' opportunité(s).'); 
             OpportunityHandler.processClosedWonOpportunities(closedWonOpps);
+            //transmet la liste des opportunités gagnées à OpportunityHandler
         }
     }
 }

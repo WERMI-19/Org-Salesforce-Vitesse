@@ -1,36 +1,26 @@
-// Teste les opérations sur les lignes d’opportunité : 
-//récupération, suppression et mise à jour de stock.
-
+// DML, Teste les opérations sur les lignes d’opportunité
 
 public with sharing class OpportunityLineItemController {
+  // Récupère les lignes de produit associées à une opp
 
-    /**
-     * Récupère les lignes de produit associées à une opportunité.
-     * Utilisé pour afficher les produits liés à une opportunité dans un composant LWC ou Aura.
-     */
     @AuraEnabled(cacheable=true)
     public static List<OpportunityLineItem> getOpportunityLineItems(Id opportunityId) {
         return [
             SELECT Id, Quantity, UnitPrice, TotalPrice,
                    Product2.Id, Product2.Name, Product2.QuantityInStock__c
             FROM OpportunityLineItem
-            WHERE OpportunityId = :opportunityId
+            WHERE OpportunityId = :opportunityId // Filtre par ID d'opportunité
         ];
     }
 
-    /**
-     * Supprime une ligne de produit de l'opportunité.
-     * On laisse Salesforce gérer automatiquement les erreurs (ex : ID inexistant).
-     */
+     // Supprime une ligne de produit de l'opportunité.
+    
     @AuraEnabled
     public static void deleteOpportunityLineItem(Id lineItemId) {
         delete new OpportunityLineItem(Id = lineItemId);
     }
-
-    /**
-     * Met à jour le stock de plusieurs produits à partir d’une liste de maps clé/valeur.
-     * Ignore les entrées invalides sans bloquer l’exécution.
-     */
+    
+    // MAJ stock +ieurs produits à partir d’une liste de maps. Ignore les entrées invalides
     @AuraEnabled
     public static void updateProductStock(List<Map<String, Object>> updates) {
         List<Product2> produitsAMettreAJour = new List<Product2>();
@@ -42,23 +32,23 @@ public with sharing class OpportunityLineItemController {
 
         for (Map<String, Object> ligne : updates) {
             try {
-                // On vérifie que les clés nécessaires sont présentes
+                // vérifie que les clés nécessaires sont présentes
                 if (ligne == null || !ligne.containsKey('productId') || !ligne.containsKey('quantityInStock')) {
                     continue;
                 }
 
-                // Conversion de la quantité vers Decimal (via String pour plus de robustesse)
+                // Conversion de la quantité vers Decimal 
                 Id productId = (Id) ligne.get('productId');
                 Decimal quantity = Decimal.valueOf(String.valueOf(ligne.get('quantityInStock')));
 
                 produitsAMettreAJour.add(new Product2(Id = productId, QuantityInStock__c = quantity));
             } catch (Exception e) {
-                // On ignore discrètement les lignes incorrectes sans planter toute l'opération
+                // ignorer les lignes incorrectes sans planter toute l'opération
                 continue;
             }
         }
 
-        // Mise à jour en masse si on a des produits valides à modifier
+        // MAJ en masse si  produits valides 
         if (!produitsAMettreAJour.isEmpty()) {
             update produitsAMettreAJour;
         }
