@@ -1,3 +1,4 @@
+//author: WERMI ADAMA - Mai 2025
 // Trigger avant mise à jour qui détecte le passage à "Closed Won"
 // et ajuste le stock via OpportunityHandler.
 

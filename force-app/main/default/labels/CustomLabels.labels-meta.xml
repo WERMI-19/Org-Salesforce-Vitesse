@@ -1,119 +1,195 @@
+<!-- les Customs lables pour l'internationalisation Francais et Anglais -->
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
 
-    <!-- Message d'erreur bloquant sur opportunité (Apex) -->
-    <labels>
-        <fullName>Error_Stock</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Erreur de stock sur opportunité</shortDescription>
-        <value>Votre opportunité ne peut pas être mise à jour car vous avez un souci de quantité sur vos lignes.</value>
-    </labels>
+   <!-- Label_NomProduit -->
+   <labels>
+      <fullName>Label_NomProduit</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Nom du produit</shortDescription>
+      <value>Nom du produit</value>
+   </labels>
+   <labels>
+      <fullName>Label_NomProduit</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Product Name</shortDescription>
+      <value>Product Name</value>
+   </labels>
 
-    <!-- Message affiché quand aucun produit n’est encore ajouté -->
-    <labels>
-        <fullName>Label_AucunProduit</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Aucun produit</shortDescription>
-        <value>
-            Vous n'avez aucune ligne de produits pour le moment.&lt;br/&gt;
-            1. Veuillez tout d'abord sélectionner un Catalogue (Pricebook)&lt;br/&gt;
-            2. Sélectionnez ensuite les produits à ajouter.
-        </value>
-    </labels>
+   <!-- Label_Quantite -->
+   <labels>
+      <fullName>Label_Quantite</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Quantité</shortDescription>
+      <value>Quantité</value>
+   </labels>
+   <labels>
+      <fullName>Label_Quantite</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Quantity</shortDescription>
+      <value>Quantity</value>
+   </labels>
 
-    <!-- Message d’erreur si la mise à jour du stock a échoué -->
-    <labels>
-        <fullName>Label_ErreurMajStock</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Erreur mise à jour stock</shortDescription>
-        <value>Votre opportunité ne peut pas être mise à jour car vous avez un souci de quantité sur vos lignes.</value>
-    </labels>
+   <!-- Label_PrixUnitaire -->
+   <labels>
+      <fullName>Label_PrixUnitaire</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Prix unitaire</shortDescription>
+      <value>Prix unitaire</value>
+   </labels>
+   <labels>
+      <fullName>Label_PrixUnitaire</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Unit Price</shortDescription>
+      <value>Unit Price</value>
+   </labels>
 
-    <!-- Bannière orange affichée dans le composant en cas d’erreur de stock -->
-    <labels>
-        <fullName>Label_MessageStockError</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Erreur stock</shortDescription>
-        <value>
-            Vous avez au moins une ligne avec un problème de quantité, veuillez supprimer cette ligne ou réduire sa quantité.&lt;br/&gt;
-            Si vous avez absolument besoin de plus de produits, veuillez contacter votre administrateur système.
-        </value>
-    </labels>
+   <!-- Label_PrixTotal -->
+   <labels>
+      <fullName>Label_PrixTotal</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Prix Total</shortDescription>
+      <value>Prix Total</value>
+   </labels>
+   <labels>
+      <fullName>Label_PrixTotal</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Total Price</shortDescription>
+      <value>Total Price</value>
+   </labels>
 
-    <!-- Titre de colonne dans la datatable -->
-    <labels>
-        <fullName>Label_NomProduit</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Nom du produit</shortDescription>
-        <value>Nom du produit</value>
-    </labels>
+   <!-- Label_QuantiteStock -->
+   <labels>
+      <fullName>Label_QuantiteStock</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Quantité en Stock</shortDescription>
+      <value>Quantité en Stock</value>
+   </labels>
+   <labels>
+      <fullName>Label_QuantiteStock</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Quantity in stock</shortDescription>
+      <value>Quantity in stock</value>
+   </labels>
 
-    <!-- Titre de composant Lightning (LWC) -->
-    <labels>
-        <fullName>Label_OpportunityProduits</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Opportunité produits</shortDescription>
-        <value>Opportunité produits</value>
-    </labels>
+   <!-- Label_Supprimer -->
+   <labels>
+      <fullName>Label_Supprimer</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Supprimer</shortDescription>
+      <value>Supprimer</value>
+   </labels>
+   <labels>
+      <fullName>Label_Supprimer</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Delete</shortDescription>
+      <value>Delete</value>
+   </labels>
 
-    <!-- Colonne prix total -->
-    <labels>
-        <fullName>Label_PrixTotal</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Prix total</shortDescription>
-        <value>Prix total</value>
-    </labels>
+   <!-- Label_VoirProduit -->
+   <labels>
+      <fullName>Label_VoirProduit</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Voir Produit</shortDescription> 
+      <value>Voir Produit</value> <!--Voir Produit-->
+   </labels>
+   <labels>
+      <fullName>Label_VoirProduit</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>See product</shortDescription>
+      <value>See product</value>
+   </labels>
 
-    <!-- Colonne prix unitaire -->
-    <labels>
-        <fullName>Label_PrixUnitaire</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Prix unitaire</shortDescription>
-        <value>Prix unitaire</value>
-    </labels>
+   <!-- Label_MessageStockError -->
+   <labels>
+      <fullName>Label_MessageStockError</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Erreur de quantité</shortDescription>
+      <value>
+         Vous avez au moins une ligne avec un problème de quantité, veuillez supprimer cette ligne ou réduire sa quantité.&lt;br/&gt;
+         Si vous avez absolument besoin de plus de produits, veuillez contacter votre administrateur système.
+      </value>
+   </labels>
+   <labels>
+      <fullName>Label_MessageStockError</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Quantity error message</shortDescription>
+      <value>
+         You have at least one line with a quantity problem, please delete this line or reduce its quantity.&lt;br/&gt;
+         If you absolutely need more products, please contact your system administrator.
+      </value>
+   </labels>
 
-    <!-- Colonne quantité -->
-    <labels>
-        <fullName>Label_Quantite</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Quantité</shortDescription>
-        <value>Quantité</value>
-    </labels>
+   <!-- Label_OpportunityProduits -->
+   <labels>
+      <fullName>Label_OpportunityProduits</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Opportunité produits</shortDescription>
+      <value>Opportunité produits</value>
+   </labels>
+   <labels>
+      <fullName>Label_OpportunityProduits</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Opportunity products</shortDescription>
+      <value>Opportunity products</value>
+   </labels>
 
-    <!-- Colonne stock disponible -->
-    <labels>
-        <fullName>Label_QuantiteStock</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Quantité en Stock</shortDescription>
-        <value>Quantité en Stock</value>
-    </labels>
+   <!-- Label_ErreurMajStock -->
+   <labels>
+      <fullName>Label_ErreurMajStock</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Erreur mise à jour stock</shortDescription>
+      <value>Votre opportunité ne peut pas être mise à jour car vous avez un souci de quantité sur vos lignes.</value>
+   </labels>
+   <labels>
+      <fullName>Label_ErreurMajStock</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>Stock update error</shortDescription>
+      <value>Your opportunity cannot be updated because you have a quantity problem on your lines.</value>
+   </labels>
 
-    <!-- Action de suppression d’une ligne -->
-    <labels>
-        <fullName>Label_Supprimer</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Supprimer</shortDescription>
-        <value>Supprimer</value>
-    </labels>
-
-    <!-- Bouton redirigeant vers le produit -->
-    <labels>
-        <fullName>Label_VoirProduit</fullName>
-        <language>fr</language>
-        <protected>false</protected>
-        <shortDescription>Voir produit</shortDescription>
-        <value>Voir produit</value>
-    </labels>
+   <!-- Label_AucunProduit -->
+   <labels>
+      <fullName>Label_AucunProduit</fullName>
+      <language>fr</language>
+      <protected>false</protected>
+      <shortDescription>Aucun produit</shortDescription>
+      <value>
+         Vous n'avez aucune ligne de produits pour le moment.&lt;br/&gt;
+         1. Veuillez tout d'abord sélectionner un Catalogue (Pricebook)&lt;br/&gt;
+         2. Sélectionnez ensuite les produits à ajouter.&lt;br/&gt;
+      </value>
+   </labels>
+   <labels>
+      <fullName>Label_AucunProduit</fullName>
+      <language>en</language>
+      <protected>false</protected>
+      <shortDescription>No product line</shortDescription>
+      <value>
+         You don't have any product lines at the moment.&lt;br/&gt;
+         1. First select a Catalog (Pricebook)&lt;br/&gt;
+         2. Then select the products you wish to add.
+      </value>
+   </labels>
 
 </CustomLabels>

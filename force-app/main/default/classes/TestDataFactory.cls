@@ -1,4 +1,5 @@
 @isTest
+//author: WERMI ADAMA - Mai 2025
 // Fournit des méthodes utilitaires pour générer des données 
 //de test complètes et réutilisables.
 

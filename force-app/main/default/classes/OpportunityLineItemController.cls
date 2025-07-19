@@ -1,3 +1,4 @@
+//author: WERMI ADAMA - Mai 2025
 // DML, Teste les opérations sur les lignes d’opportunité
 
 public with sharing class OpportunityLineItemController {

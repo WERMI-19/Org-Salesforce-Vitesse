@@ -1,6 +1,9 @@
-import { LightningElement, api } from 'lwc';
+//author: WERMI ADAMA - Mai 2025
+import { LightningElement, api , track} from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
+
 
 // IMPORT des custom labels  pour traduire les champs et bouttons (internationalisation)
 // Demander en fin du KanBan du projet 
@@ -22,7 +25,8 @@ import getCurrentUserProfile from '@salesforce/apex/UserProfileController.getCur
 
 export default class OpportunityProductViewer extends NavigationMixin(LightningElement) {
     @api recordId;
-    lineItems = [];
+    @track lineItems = []; 
+
     userProfile = '';
     columns = [];
     // Tous les labels sont regroupés pour usage JS (datatable) et HTML
@@ -86,7 +90,7 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
                 type: 'button',
                 label: Label_VoirProduit,
                 typeAttributes: {
-                    label: Label_VoirProduit,
+                    label: 'View Product',
                     name: 'view',
                     iconName: 'utility:preview',
                     variant: 'brand'

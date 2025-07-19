@@ -1,3 +1,4 @@
+//author: WERMI ADAMA - Mai 2025
 // recupere Userprofile Name: "Commercial" ou un "System Administrator".
 public with sharing class UserProfileController {
     @AuraEnabled(cacheable=true)

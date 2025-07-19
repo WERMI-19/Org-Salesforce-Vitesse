@@ -1,3 +1,4 @@
+//author: WERMI ADAMA - Mai 2025
 // Gère les opportunités gagnées et ajuste le stock des produits.
 
 public with sharing class OpportunityHandler {
