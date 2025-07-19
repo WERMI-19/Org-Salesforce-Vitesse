@@ -1,35 +1,36 @@
 //author: WERMI ADAMA - Mai 2025
-import { LightningElement, api , track} from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+// LWC modules
+import { LightningElement, api, track, wire } from 'lwc'; // core LWC features
+import { NavigationMixin } from 'lightning/navigation'; // navigation mixin
+import { ShowToastEvent } from 'lightning/platformShowToastEvent'; // toast notifications
+import { refreshApex } from '@salesforce/apex'; // refresh @wire cache
 
+// Custom Labels
+import Label_NomProduit        from '@salesforce/label/c.Label_NomProduit';        // “Nom Produit”
+import Label_Quantite          from '@salesforce/label/c.Label_Quantite';          // “Quantité”
+import Label_PrixUnitaire      from '@salesforce/label/c.Label_PrixUnitaire';      // “Prix Unitaire”
+import Label_PrixTotal         from '@salesforce/label/c.Label_PrixTotal';         // “Prix Total”
+import Label_QuantiteStock     from '@salesforce/label/c.Label_QuantiteStock';     // “Quantité en Stock”
+import Label_Supprimer         from '@salesforce/label/c.Label_Supprimer';         // “Supprimer”
+import Label_VoirProduit       from '@salesforce/label/c.Label_VoirProduit';       // “Voir Produit”
+import Label_MessageStockError from '@salesforce/label/c.Label_MessageStockError'; // “Stock Insuffisant”
+import Label_OpportunityProduits from '@salesforce/label/c.Label_OpportunityProduits'; // “Produits Opportunité”
+import Label_ErreurMajStock    from '@salesforce/label/c.Label_ErreurMajStock';    // “Erreur MAJ Stock”
+import Label_AucunProduit      from '@salesforce/label/c.Label_AucunProduit';      // “Aucun Produit”
 
-
-// IMPORT des custom labels  pour traduire les champs et bouttons (internationalisation)
-// Demander en fin du KanBan du projet 
-import Label_NomProduit from '@salesforce/label/c.Label_NomProduit';
-import Label_Quantite from '@salesforce/label/c.Label_Quantite';
-import Label_PrixUnitaire from '@salesforce/label/c.Label_PrixUnitaire';
-import Label_PrixTotal from '@salesforce/label/c.Label_PrixTotal';
-import Label_QuantiteStock from '@salesforce/label/c.Label_QuantiteStock';
-import Label_Supprimer from '@salesforce/label/c.Label_Supprimer';
-import Label_VoirProduit from '@salesforce/label/c.Label_VoirProduit';
-import Label_MessageStockError from '@salesforce/label/c.Label_MessageStockError';
-import Label_OpportunityProduits from '@salesforce/label/c.Label_OpportunityProduits';
-import Label_ErreurMajStock from '@salesforce/label/c.Label_ErreurMajStock';
-import Label_AucunProduit from '@salesforce/label/c.Label_AucunProduit';
-
-import getOpportunityLineItems from '@salesforce/apex/OpportunityLineItemController.getOpportunityLineItems';
-import deleteOpportunityLineItem from '@salesforce/apex/OpportunityLineItemController.deleteOpportunityLineItem';
-import getCurrentUserProfile from '@salesforce/apex/UserProfileController.getCurrentUserProfile';
+// Apex methods
+import getOpportunityLineItems   from '@salesforce/apex/OpportunityLineItemController.getOpportunityLineItems'; // fetches line items
+import deleteOpportunityLineItem from '@salesforce/apex/OpportunityLineItemController.deleteOpportunityLineItem'; // deletes a line item
+import getCurrentUserProfile     from '@salesforce/apex/UserProfileController.getCurrentUserProfile';         // fetches user profile
 
 export default class OpportunityProductViewer extends NavigationMixin(LightningElement) {
-    @api recordId;
-    @track lineItems = []; 
+    @api recordId;             // current Opportunity Id
+    @track lineItems = [];     // data for the datatable
+    wiredResult;               // holds @wire result for refreshApex
+    userProfile = '';          // stores current user’s profile
+    columns = [];              // datatable column definitions
 
-    userProfile = '';
-    columns = [];
-    // Tous les labels sont regroupés pour usage JS (datatable) et HTML
+    // grouped labels for ease of use
     label = {
         Label_NomProduit,
         Label_Quantite,
@@ -45,129 +46,125 @@ export default class OpportunityProductViewer extends NavigationMixin(LightningE
     };
 
     connectedCallback() {
-        this.initComponent();  // au demarrage on initie le composant pr charger les données
-    } // life cycle hooks
+        this.initProfileAndColumns(); // fetch profile & build columns
+    }
 
-    async initComponent() {
+    async initProfileAndColumns() {
         try {
-            this.userProfile = await getCurrentUserProfile(); // recuperer le profil (admin ou commercial)
-            this.columns = this.buildColumns(); // construire les colonnes avec les bon labels traduits
-            await this.loadLineItems();
+            this.userProfile = await getCurrentUserProfile(); // call Apex for profile
+            this.columns    = this.buildColumns();            // setup datatable columns
         } catch (error) {
-            console.error('Erreur d\'initialisation :', error);
-            this.showToast('Erreur', 'Échec de l’initialisation du composant', 'error');
+            console.error('Erreur d’initialisation :', error);
+            this.showToast('Erreur', 'Échec de l’initialisation', 'error'); // notify user
+        }
+    }
+
+    // load and process line items via @wire
+    @wire(getOpportunityLineItems, { opportunityId: '$recordId' })
+    wiredLineItems(result) {
+        this.wiredResult = result;              // save for refreshApex
+        const { data, error } = result;
+        if (data) {
+            // map raw items to UI-friendly objects
+            this.lineItems = data.map(item => {
+                const qtyStock = item.Product2?.QuantityInStock__c ?? 0;
+                return {
+                    id:              item.Id,
+                    productName:     item.Product2?.Name,
+                    productId:       item.Product2?.Id,
+                    quantity:        item.Quantity,
+                    unitPrice:       item.UnitPrice,
+                    totalPrice:      item.Quantity * item.UnitPrice,
+                    quantityInStock: qtyStock,
+                    stockError:      (qtyStock - item.Quantity) < 0
+                                      ? 'background-image: repeating-linear-gradient(45deg,#eee,#eee 10px,#ddd 10px,#ddd 20px); color: brown; font-weight: bold;'
+                                      : 'color: darkgreen; font-weight: bold;'
+                };
+            });
+        } else if (error) {
+            console.error('Erreur de chargement des lignes :', error);
+            this.lineItems = []; // clear on error
         }
     }
 
     buildColumns() {
-        const baseColumns = [
-            { label: Label_NomProduit, fieldName: 'productName', type: 'text' },
-            { label: Label_Quantite, fieldName: 'quantity', type: 'number',
-                cellAttributes: {   // couleur rouge SUR QUANTITE SI stock insuffisant & css inline
-                    style: { fieldName: 'stockError' }
-                }
-            },
-            { label: Label_PrixUnitaire, fieldName: 'unitPrice', type: 'currency' },
-            { label: Label_PrixTotal, fieldName: 'totalPrice', type: 'currency' },
-            { label: Label_QuantiteStock, fieldName: 'quantityInStock', type: 'number' },
-            {
-                label: Label_Supprimer,
-                type: 'button-icon',
-                typeAttributes: {
-                    iconName: 'utility:delete',
-                    name: 'delete',
-                    title: Label_Supprimer,
-                    variant: 'border-filled',
-                    alternativeText: Label_Supprimer
-                }
+        // base columns for datatable
+        const cols = [
+            { label: Label_NomProduit,    fieldName: 'productName',     type: 'text' },    // product name
+            { label: Label_Quantite,      fieldName: 'quantity',        type: 'number',    // quantity
+              cellAttributes: { style: { fieldName: 'stockError' } } },
+            { label: Label_PrixUnitaire,  fieldName: 'unitPrice',       type: 'currency' },// unit price
+            { label: Label_PrixTotal,     fieldName: 'totalPrice',      type: 'currency' },// total price
+            { label: Label_QuantiteStock, fieldName: 'quantityInStock', type: 'number' },  // stock available
+            { label: Label_Supprimer,      type: 'button-icon',                                   // delete button
+              typeAttributes: {
+                  iconName:       'utility:delete',
+                  name:           'delete',
+                  title:          Label_Supprimer,
+                  alternativeText: Label_Supprimer,
+                  variant:        'border-filled'
+              }
             }
         ];
-
-        // lowercase pour eviter les erreurs de majuscule
-        const normalizedProfile = this.userProfile?.toLowerCase();
-        if (normalizedProfile === 'system administrator') {
-            baseColumns.push({ // Ajouter la colonne VOIR produit uniquement pour les admins
+        // add "View Product" button for admins
+        if (this.userProfile?.toLowerCase() === 'system administrator') {
+            cols.push({
                 type: 'button',
                 label: Label_VoirProduit,
                 typeAttributes: {
-                    label: 'View Product',
-                    name: 'view',
+                    label:    Label_VoirProduit,
+                    name:     'view',
                     iconName: 'utility:preview',
-                    variant: 'brand'
+                    variant:  'brand'
                 }
             });
         }
-
-        return baseColumns;  // retourne les colonnes qu’on va utiliser dans datatable
+        return cols;
     }
 
-    async loadLineItems() {
-        try {
-            const rawItems = await getOpportunityLineItems({ opportunityId: this.recordId });
-            this.lineItems = rawItems.map(item => {
-                const quantityInStock = item.Product2?.QuantityInStock__c ?? 0;
-                return {
-                    id: item.Id,
-                    quantity: item.Quantity,
-                    unitPrice: item.UnitPrice,
-                    totalPrice: item.TotalPrice,
-                    quantityInStock: quantityInStock,
-                    productName: item.Product2?.Name,
-                    productId: item.Product2?.Id,
-                    stockError: (quantityInStock - item.Quantity) < 0
-                        ? 'background-image: repeating-linear-gradient(45deg, #eeeeee, #eeeeee 10px, #dddddd 10px, #dddddd 20px); color: brown; font-weight: bold;'
-                        : 'color: darkgreen; font-weight: bold;',
-                };
-            });
-        } catch (error) {
-            console.error('Votre opportunité ne peut pas être mise à jour car vous avez un souci de quantité sur vos lignes.', error);
-            this.lineItems = [];
-        }
+    get hasLineItems() {
+        return Array.isArray(this.lineItems) && this.lineItems.length > 0; // checks for data
     }
 
-    get hasLineItems() { // verifier si ya au moin UNE ligne ou non
-        return Array.isArray(this.lineItems) && this.lineItems.length > 0;
+    get hasStockError() {
+        return this.lineItems.some(item => (item.quantityInStock - item.quantity) < 0); // any negative stock?
     }
 
-    get hasStockError() { // verifie si une ligne a un stock negatif
-        return this.lineItems.some(item => (item.quantityInStock - item.quantity) < 0);
+    handleRowAction(event) {
+        const { name, row } = event.detail.action
+            ? { name: event.detail.action.name, row: event.detail.row }
+            : {};
+        if (name === 'delete') this.handleDelete(row); // delete action
+        if (name === 'view')   this.handleViewProduct(row); // view action
     }
 
-    handleRowAction(event) { // LES redirections
-        const { name } = event.detail.action;
-        const row = event.detail.row;
-
-        if (name === 'delete') {
-            this.handleDelete(row);  // quand click SUPPRIMER on supprime la ligne
-        } else if (name === 'view') {
-            this.handleViewProduct(row); // click VOIR produit > redirige sur la page du produit
-        }
-    }
-
+    // delete via Apex then refresh wire
     async handleDelete(row) {
         try {
-            await deleteOpportunityLineItem({ lineItemId: row.id });
-            this.showToast('Succès', 'Ligne supprimée avec succès', 'success');
-            await this.loadLineItems(); // recharge la liste apres suppression pour MAJ l'affichage
+            await deleteOpportunityLineItem({ lineItemId: row.id }); // call Apex
+            this.showToast('Succès', 'Ligne supprimée', 'success');   // notify
+            await refreshApex(this.wiredResult);                       // refresh data
         } catch (error) {
-            this.showToast('Erreur', error.body?.message || 'Erreur inconnue', 'error');
+            this.showToast('Erreur', error.body?.message || 'Erreur inconnue', 'error'); // error toast
         }
     }
 
     handleViewProduct(row) {
+        // navigate to Product2 record page
         if (this.userProfile?.toLowerCase() === 'system administrator') {
             this[NavigationMixin.Navigate]({
                 type: 'standard__recordPage',
                 attributes: {
-                    recordId: row.productId,
-                    objectApiName: 'Product2',
-                    actionName: 'view'
+                    recordId:     row.productId,
+                    objectApiName:'Product2',
+                    actionName:   'view'
                 }
             });
         }
     }
 
+    // helper to show toast messages
     showToast(title, message, variant) {
-        this.dispatchEvent(new ShowToastEvent({ title, message, variant })); // affiche une notification TOAST
+        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
     }
 }
